@@ -31,6 +31,8 @@ public class JobApplication {
     private LocalDateTime applicationDate;
     private LocalDateTime lastUpdated;
 
+    private String resumeUrl;
+
     @PrePersist
     protected void onCreate() {
         applicationDate = LocalDateTime.now();
@@ -80,4 +82,7 @@ public class JobApplication {
 
     public LocalDateTime getApplicationDate() { return applicationDate; }
     public LocalDateTime getLastUpdated() { return lastUpdated; }
+
+    public String getResumeUrl() { return resumeUrl; }
+    public void setResumeUrl(String resumeUrl) { this.resumeUrl = resumeUrl; }
 }

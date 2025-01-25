@@ -14,14 +14,17 @@ public class JobApplicationRequest {
     private String jobUrl;
     private JobApplication.ApplicationStatus status;
 
+    private String resumeUrl;
+
     // Constructors
     public JobApplicationRequest() {}
 
-    public JobApplicationRequest(String companyName, String jobTitle, String jobDescription, String jobUrl) {
+    public JobApplicationRequest(String companyName, String jobTitle, String jobDescription, String jobUrl, String resumeUrl) {
         this.companyName = companyName;
         this.jobTitle = jobTitle;
         this.jobDescription = jobDescription;
         this.jobUrl = jobUrl;
+        this.resumeUrl = resumeUrl;
     }
 
     // Getters and Setters
@@ -39,4 +42,7 @@ public class JobApplicationRequest {
 
     public JobApplication.ApplicationStatus getStatus() { return status; }
     public void setStatus(JobApplication.ApplicationStatus status) { this.status = status; }
+
+    public String getResumeUrl() { return resumeUrl; }
+    public void setResumeUrl(String resumeUrl) { this.resumeUrl = resumeUrl; }
 }

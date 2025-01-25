@@ -31,6 +31,7 @@ public class JobApplicationService {
 
     public ResponseEntity<?> createApplication(JobApplicationRequest request) {
         User currentUser = getCurrentUser();
+        System.out.println("request"+request.getResumeUrl());
 
         JobApplication application = new JobApplication();
         application.setUser(currentUser);
@@ -38,6 +39,7 @@ public class JobApplicationService {
         application.setJobTitle(request.getJobTitle());
         application.setJobDescription(request.getJobDescription());
         application.setJobUrl(request.getJobUrl());
+        application.setResumeUrl(request.getResumeUrl());
         application.setStatus(request.getStatus());
 
         JobApplication savedApplication = jobApplicationRepository.save(application);
@@ -69,6 +71,7 @@ public class JobApplicationService {
         existingApplication.setJobTitle(request.getJobTitle());
         existingApplication.setJobDescription(request.getJobDescription());
         existingApplication.setJobUrl(request.getJobUrl());
+        existingApplication.setResumeUrl(request.getResumeUrl());
         existingApplication.setStatus(request.getStatus());
 
         JobApplication updatedApplication = jobApplicationRepository.save(existingApplication);
