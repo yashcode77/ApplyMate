@@ -3,6 +3,8 @@ package com.ApplyMate.ApplyMate.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "job_applications")
@@ -32,6 +34,17 @@ public class JobApplication {
     private LocalDateTime lastUpdated;
 
     private String resumeUrl;
+
+    @OneToMany(mappedBy = "jobApplication", cascade = CascadeType.ALL)
+    private List<Interview> interviews = new ArrayList<>();
+
+    public List<Interview> getInterviews() {
+        return interviews;
+    }
+
+    public void setInterviews(List<Interview> interviews) {
+        this.interviews = interviews;
+    }
 
     @PrePersist
     protected void onCreate() {

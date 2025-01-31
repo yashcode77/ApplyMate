@@ -7,6 +7,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -23,8 +27,22 @@ public class JobApplicationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<JobApplication>> getAllApplications() {
-        return jobApplicationService.getAllApplications();
+    public ResponseEntity<?> getAllApplications(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            String username = userDetails.getUsername();
+            List<JobApplication> applications = jobApplicationService.getAllApplicationsByUsername(username);
+            
+            // Debug log
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(applications);
+            System.out.println("Response JSON: " + jsonString);
+            
+            return ResponseEntity.ok(applications);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error fetching applications: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
