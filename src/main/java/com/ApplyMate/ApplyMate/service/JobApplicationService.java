@@ -31,7 +31,7 @@ public class JobApplicationService {
 
     public ResponseEntity<?> createApplication(JobApplicationRequest request) {
         User currentUser = getCurrentUser();
-        System.out.println("request"+request.getResumeUrl());
+        System.out.println("request" + request.getResumeUrl());
 
         JobApplication application = new JobApplication();
         application.setUser(currentUser);
@@ -86,5 +86,9 @@ public class JobApplicationService {
 
         jobApplicationRepository.delete(application);
         return ResponseEntity.ok("Application deleted successfully");
+    }
+
+    public List<JobApplication> getAllApplicationsByUsername(String username) {
+        return jobApplicationRepository.findByUserUsername(username);
     }
 }
