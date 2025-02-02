@@ -147,4 +147,8 @@ public class JobApplication {
     public void setResumeUrl(String resumeUrl) {
         this.resumeUrl = resumeUrl;
     }
+
+    public void setApplicationDate(LocalDateTime applicationDate) {
+        this.applicationDate = applicationDate;
+    }
 }
