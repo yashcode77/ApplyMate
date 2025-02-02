@@ -37,6 +37,7 @@ public class JobApplicationController {
             List<JobApplicationDTO> applicationDTOs = applications.stream()
                     .map(JobApplicationDTO::new)
                     .collect(Collectors.toList());
+            System.out.println("hereee");
             return ResponseEntity.ok(applicationDTOs);
         } catch (Exception e) {
             e.printStackTrace();

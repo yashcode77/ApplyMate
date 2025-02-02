@@ -2,9 +2,11 @@ package com.ApplyMate.ApplyMate.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "interviews")
+@JsonIgnoreProperties("interviews")
 public class Interview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,5 +88,5 @@ public class Interview {
     }
 
     // Getters and setters
-    
+
 }

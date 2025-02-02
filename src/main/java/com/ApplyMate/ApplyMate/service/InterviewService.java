@@ -29,8 +29,8 @@ public class InterviewService {
     public Interview createInterview(InterviewRequest request) {
         // Verify the job application exists
         JobApplication jobApplication = jobApplicationRepository.findById(request.getJobApplicationId())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "Job Application not found with id: " + request.getJobApplicationId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Job Application not found with id: " + request.getJobApplicationId()));
 
         // Validate round number
         validateRoundNumber(request.getRoundNumber(), request.getJobApplicationId());
@@ -39,7 +39,7 @@ public class InterviewService {
         Interview interview = new Interview();
         updateInterviewFromRequest(interview, request);
         interview.setJobApplication(jobApplication);
-        
+
         return interviewRepository.save(interview);
     }
 
@@ -49,7 +49,7 @@ public class InterviewService {
     @Transactional
     public Interview updateInterview(Long id, InterviewRequest request) {
         Interview interview = interviewRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + id));
 
         // If round number is being changed, validate it
         if (!interview.getRoundNumber().equals(request.getRoundNumber())) {
@@ -66,11 +66,11 @@ public class InterviewService {
     @Transactional
     public void deleteInterview(Long id) {
         Interview interview = interviewRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + id));
-        
+                .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + id));
+
         // Reorder remaining rounds if necessary
         reorderRoundsAfterDeletion(interview);
-        
+
         interviewRepository.deleteById(id);
     }
 
@@ -78,11 +78,16 @@ public class InterviewService {
      * Retrieves all interviews for a specific job application
      */
     public List<Interview> getInterviewsByApplication(Long applicationId) {
-        // Verify the job application exists
-        if (!jobApplicationRepository.existsById(applicationId)) {
-            throw new EntityNotFoundException("Job Application not found with id: " + applicationId);
-        }
-        return interviewRepository.findByJobApplicationIdOrderByInterviewDateAsc(applicationId);
+        System.out.println("Fetching interviews for application ID: " + applicationId);
+        List<Interview> interviews = interviewRepository.findByJobApplicationIdOrderByInterviewDateAsc(applicationId);
+        System.out.println("Found " + interviews.size() + " interviews");
+        interviews.forEach(interview -> {
+            System.out.println("Interview ID: " + interview.getId());
+            System.out.println("Round: " + interview.getRoundNumber());
+            System.out.println("Type: " + interview.getInterviewType());
+            System.out.println("Status: " + interview.getStatus());
+        });
+        return interviews;
     }
 
     /**
@@ -90,7 +95,7 @@ public class InterviewService {
      */
     public Interview getInterviewById(Long id) {
         return interviewRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + id));
     }
 
     /**
@@ -119,12 +124,12 @@ public class InterviewService {
      */
     private void validateRoundNumber(Integer roundNumber, Long jobApplicationId) {
         Optional<Interview> existingInterview = interviewRepository.findByJobApplicationIdAndRoundNumber(
-            jobApplicationId, roundNumber);
-        
+                jobApplicationId, roundNumber);
+
         if (existingInterview.isPresent()) {
             throw new IllegalStateException(
-                "An interview with round number " + roundNumber + 
-                " already exists for this application");
+                    "An interview with round number " + roundNumber +
+                            " already exists for this application");
         }
     }
 
@@ -133,9 +138,9 @@ public class InterviewService {
      */
     private void reorderRoundsAfterDeletion(Interview deletedInterview) {
         List<Interview> laterRounds = interviewRepository
-            .findByJobApplicationIdAndRoundNumberGreaterThan(
-                deletedInterview.getJobApplication().getId(),
-                deletedInterview.getRoundNumber());
+                .findByJobApplicationIdAndRoundNumberGreaterThan(
+                        deletedInterview.getJobApplication().getId(),
+                        deletedInterview.getRoundNumber());
 
         for (Interview interview : laterRounds) {
             interview.setRoundNumber(interview.getRoundNumber() - 1);
@@ -148,8 +153,8 @@ public class InterviewService {
      */
     public Integer getNextRoundNumber(Long jobApplicationId) {
         return interviewRepository.findMaxRoundNumberByJobApplicationId(jobApplicationId)
-            .map(maxRound -> maxRound + 1)
-            .orElse(1);
+                .map(maxRound -> maxRound + 1)
+                .orElse(1);
     }
 
     /**

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "job_applications")
@@ -39,7 +40,8 @@ public class JobApplication {
 
     private String resumeUrl;
 
-    @OneToMany(mappedBy = "jobApplication", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "jobApplication", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("jobApplication")
     private List<Interview> interviews = new ArrayList<>();
 
     public List<Interview> getInterviews() {

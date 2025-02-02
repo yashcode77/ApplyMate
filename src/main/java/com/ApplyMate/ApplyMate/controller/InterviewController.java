@@ -44,11 +44,9 @@ public class InterviewController {
     }
 
     @GetMapping("/application/{applicationId}")
-    public ResponseEntity<List<InterviewResponse>> getInterviewsByApplication(@PathVariable Long applicationId) {
+    public ResponseEntity<List<Interview>> getInterviewsByApplication(@PathVariable Long applicationId) {
+        System.out.println("Fetching interviews for application ID: " + applicationId);
         List<Interview> interviews = interviewService.getInterviewsByApplication(applicationId);
-        List<InterviewResponse> response = interviews.stream()
-            .map(InterviewResponse::new)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(interviews);
     }
 }

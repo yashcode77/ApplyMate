@@ -89,19 +89,65 @@ public class JobApplicationService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<List<JobApplication>> getAllApplications() {
-        User currentUser = getCurrentUser();
-        List<JobApplication> applications = jobApplicationRepository.findByUser(currentUser);
-        return ResponseEntity.ok(applications);
+        try {
+            User currentUser = getCurrentUser();
+            System.out.println("Fetching applications for user: " + currentUser.getUsername());
+
+            List<JobApplication> applications = jobApplicationRepository.findByUser(currentUser);
+            System.out.println("Found " + applications.size() + " applications");
+
+            // Debug each application
+            applications.forEach(app -> {
+                System.out.println("\nApplication ID: " + app.getId());
+                System.out.println("Company: " + app.getCompanyName());
+
+                // Debug interviews
+                List<Interview> interviews = app.getInterviews();
+                System.out.println("Raw interviews object: " + interviews);
+                System.out.println("Interviews size: " + (interviews != null ? interviews.size() : "null"));
+
+                if (interviews != null && !interviews.isEmpty()) {
+                    interviews.forEach(interview -> {
+                        System.out.println("  Interview ID: " + interview.getId());
+                        System.out.println("  Round: " + interview.getRoundNumber());
+                        System.out.println("  Type: " + interview.getInterviewType());
+                        System.out.println("  Status: " + interview.getStatus());
+                    });
+                }
+
+                // Debug the entire application object
+                System.out.println("Full application object: " + app.toString());
+            });
+
+            return ResponseEntity.ok(applications);
+
+        } catch (Exception e) {
+            System.err.println("Error in getAllApplications: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getApplicationById(Long id) {
-        User currentUser = getCurrentUser();
-        JobApplication application = jobApplicationRepository.findById(id)
-                .filter(app -> app.getUser().getId().equals(currentUser.getId()))
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+        try {
+            User currentUser = getCurrentUser();
+            JobApplication application = jobApplicationRepository.findById(id)
+                    .filter(app -> app.getUser().getId().equals(currentUser.getId()))
+                    .orElseThrow(() -> new RuntimeException("Application not found"));
 
-        return ResponseEntity.ok(application);
+            // Debug log
+            System.out.println("Found application: " + application.getId());
+            System.out.println("Interviews: " + application.getInterviews().size());
+
+            return ResponseEntity.ok(application);
+        } catch (Exception e) {
+            System.err.println("Error fetching application: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional
