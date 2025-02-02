@@ -152,40 +152,56 @@ public class JobApplicationService {
 
     @Transactional
     public ResponseEntity<?> updateApplication(Long id, JobApplicationRequest request) {
-        User currentUser = getCurrentUser();
-        JobApplication existingApplication = jobApplicationRepository.findById(id)
-                .filter(app -> app.getUser().getId().equals(currentUser.getId()))
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+        try {
+            System.out.println("Updating application: " + id);
+            System.out.println("Request data: " + request);
 
-        existingApplication.setCompanyName(request.getCompanyName());
-        existingApplication.setJobTitle(request.getJobTitle());
-        existingApplication.setJobDescription(request.getJobDescription());
-        existingApplication.setJobUrl(request.getJobUrl());
-        existingApplication.setResumeUrl(request.getResumeUrl());
-        existingApplication.setStatus(request.getStatus());
-        existingApplication.setApplicationDate(request.getApplicationDate());
+            User currentUser = getCurrentUser();
+            JobApplication existingApplication = jobApplicationRepository.findById(id)
+                    .filter(app -> app.getUser().getId().equals(currentUser.getId()))
+                    .orElseThrow(() -> new RuntimeException("Application not found"));
 
-        // Update interviews
-        if (request.getInterviews() != null) {
-            // Remove existing interviews
-            existingApplication.getInterviews().clear();
+            // Update basic fields
+            existingApplication.setCompanyName(request.getCompanyName());
+            existingApplication.setJobTitle(request.getJobTitle());
+            existingApplication.setJobDescription(request.getJobDescription());
+            existingApplication.setJobUrl(request.getJobUrl());
+            existingApplication.setResumeUrl(request.getResumeUrl());
+            existingApplication.setStatus(request.getStatus());
+            existingApplication.setApplicationDate(request.getApplicationDate());
 
-            // Add new interviews
-            for (InterviewRequest interviewRequest : request.getInterviews()) {
-                Interview interview = new Interview();
-                interview.setJobApplication(existingApplication);
-                interview.setRoundNumber(interviewRequest.getRoundNumber());
-                interview.setInterviewDate(interviewRequest.getInterviewDate());
-                interview.setInterviewType(interviewRequest.getInterviewType());
-                interview.setNotes(interviewRequest.getNotes());
-                interview.setStatus(interviewRequest.getStatus());
+            // Update interviews
+            if (request.getInterviews() != null) {
+                System.out.println("Updating " + request.getInterviews().size() + " interviews");
 
-                existingApplication.getInterviews().add(interview);
+                // Clear existing interviews
+                existingApplication.getInterviews().clear();
+
+                // Add updated interviews
+                for (InterviewRequest interviewRequest : request.getInterviews()) {
+                    System.out.println("Processing interview: " + interviewRequest);
+
+                    Interview interview = new Interview();
+                    interview.setJobApplication(existingApplication);
+                    interview.setRoundNumber(interviewRequest.getRoundNumber());
+                    interview.setInterviewDate(interviewRequest.getInterviewDate());
+                    interview.setInterviewType(interviewRequest.getInterviewType());
+                    interview.setNotes(interviewRequest.getNotes());
+                    interview.setStatus(interviewRequest.getStatus());
+
+                    existingApplication.getInterviews().add(interview);
+                }
             }
-        }
 
-        JobApplication updatedApplication = jobApplicationRepository.save(existingApplication);
-        return ResponseEntity.ok(updatedApplication);
+            JobApplication updatedApplication = jobApplicationRepository.save(existingApplication);
+            System.out.println("Application updated successfully");
+
+            return ResponseEntity.ok(updatedApplication);
+        } catch (Exception e) {
+            System.err.println("Error updating application: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public ResponseEntity<?> deleteApplication(Long id) {
