@@ -1,6 +1,7 @@
 package com.ApplyMate.ApplyMate.controller;
 
 import com.ApplyMate.ApplyMate.controller.JobApplicationRequest;
+import com.ApplyMate.ApplyMate.dto.JobApplicationDTO;
 import com.ApplyMate.ApplyMate.entity.JobApplication;
 import com.ApplyMate.ApplyMate.service.JobApplicationService;
 import jakarta.validation.Valid;
@@ -12,7 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.http.HttpStatus;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -31,17 +34,14 @@ public class JobApplicationController {
         try {
             String username = userDetails.getUsername();
             List<JobApplication> applications = jobApplicationService.getAllApplicationsByUsername(username);
-            
-            // Debug log
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonString = mapper.writeValueAsString(applications);
-            System.out.println("Response JSON: " + jsonString);
-            
-            return ResponseEntity.ok(applications);
+            List<JobApplicationDTO> applicationDTOs = applications.stream()
+                    .map(JobApplicationDTO::new)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(applicationDTOs);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error fetching applications: " + e.getMessage());
+                    .body("Error fetching applications: " + e.getMessage());
         }
     }
 
@@ -53,8 +53,7 @@ public class JobApplicationController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateApplication(
             @PathVariable Long id,
-            @Valid @RequestBody JobApplicationRequest request
-    ) {
+            @Valid @RequestBody JobApplicationRequest request) {
         return jobApplicationService.updateApplication(id, request);
     }
 
